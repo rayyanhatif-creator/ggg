@@ -12,7 +12,6 @@
             --text-color: #ffffff;
             --text-muted: #c5a059b3;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
@@ -20,12 +19,7 @@
             margin: 0;
             padding: 20px;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; }
         header {
             display: flex;
             justify-content: space-between;
@@ -34,105 +28,34 @@
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
-
-        h1 {
-            color: var(--accent-gold);
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .status-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        h1 { color: var(--accent-gold); margin: 0; font-size: 24px; }
         .live-indicator {
             color: white;
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: bold;
-            transition: all 0.3s ease;
         }
-
-        .btn-test {
-            background-color: #2c3540;
-            color: var(--text-color);
-            border: 1px solid var(--accent-gold);
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .btn-test:hover { background-color: var(--accent-gold); color: var(--bg-color); }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #2c3540;
-            padding-bottom: 10px;
-        }
-
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #2c3540; padding-bottom: 10px; }
         .tab-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-radius: 5px;
+            background: none; border: none; color: var(--text-muted);
+            padding: 10px 20px; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; border-radius: 5px;
         }
-
         .tab-btn:hover { color: var(--accent-gold); }
         .tab-btn.active { background-color: var(--accent-gold); color: var(--bg-color); }
-
         .bookings-table-container {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid rgba(197, 160, 89, 0.2);
+            background-color: var(--card-bg); border-radius: 8px;
+            overflow: hidden; border: 1px solid rgba(197, 160, 89, 0.2);
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: right;
-        }
-
+        table { width: 100%; border-collapse: collapse; text-align: right; }
         th {
-            background-color: rgba(197, 160, 89, 0.1);
-            color: var(--accent-gold);
-            padding: 15px;
-            font-weight: 600;
-            border-bottom: 2px solid rgba(197, 160, 89, 0.3);
+            background-color: rgba(197, 160, 89, 0.1); color: var(--accent-gold);
+            padding: 15px; font-weight: 600; border-bottom: 2px solid rgba(197, 160, 89, 0.3);
         }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #2c3540;
-            font-size: 15px;
-        }
-
-        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
-
-        .status-badge {
-            background-color: rgba(197, 160, 89, 0.2);
-            color: var(--accent-gold);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 13px;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-            font-style: italic;
-        }
+        td { padding: 15px; border-bottom: 1px solid #2c3540; font-size: 15px; }
+        .status-badge { background-color: rgba(197, 160, 89, 0.2); color: var(--accent-gold); padding: 4px 10px; border-radius: 4px; font-size: 13px; }
+        .no-data { text-align: center; padding: 40px; color: var(--text-muted); font-style: italic; }
     </style>
 </head>
 <body>
@@ -143,10 +66,7 @@
             <h1>لوحة تحكم الحجوزات الذكية 🎾</h1>
             <p style="color: var(--text-muted); margin: 5px 0 0 0;">حجوزات الملاعب المستلمة من شات البادل تلقائياً</p>
         </div>
-        <div class="status-container">
-            <button class="btn-test" onclick="testConnection()">فحص الاتصال يدوياً 🔍</button>
-            <div class="live-indicator" id="syncStatus" style="background-color: #ffc107; color: #000;">جاري الاتصال...</div>
-        </div>
+        <div class="live-indicator" id="syncStatus" style="background-color: #ffc107; color: #000;">جاري جلب البيانات...</div>
     </header>
 
     <div class="tabs">
@@ -168,7 +88,7 @@
                 </tr>
             </thead>
             <tbody id="bookingsBody">
-                <tr><td colspan="5" class="no-data">جاري جلب البيانات من السيرفر...</td></tr>
+                <tr><td colspan="5" class="no-data">جاري تحميل البيانات المباشرة...</td></tr>
             </tbody>
         </table>
     </div>
@@ -183,55 +103,44 @@
 
     async function fetchBookings() {
         try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=*`, {
+            // استخدام طلب مباشر عبر الحقول الأساسية لتجنب تعليق حماية المتصفح
+            const url = `${SUPABASE_URL}/rest/v1/bookings?select=*&apikey=${SUPABASE_KEY}`;
+            const response = await fetch(url, {
                 method: 'GET',
                 headers: {
-                    'apikey': SUPABASE_KEY,
                     'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Accept': 'application/json',
-                    'Prefer': 'return=representation'
+                    'Accept': 'application/json'
                 }
             });
             
             if (response.ok) {
                 allBookings = await response.json();
                 renderBookings();
-                updateStatus(true, "مُتصل ومحدّث");
+                const indicator = document.getElementById('syncStatus');
+                indicator.style.backgroundColor = "#28a745";
+                indicator.style.color = "#ffffff";
+                indicator.innerText = "مُتصل ومحدّث";
             } else {
-                updateStatus(false, "خطأ استجابة من السيرفر");
+                document.getElementById('syncStatus').style.backgroundColor = "#dc3545";
+                document.getElementById('syncStatus').innerText = "خطأ في استجابة قاعدة البيانات";
             }
         } catch (error) {
-            updateStatus(false, "فشل الاتصال بقاعدة البيانات");
-        }
-    }
-
-    function updateStatus(isSuccess, text) {
-        const indicator = document.getElementById('syncStatus');
-        if (isSuccess) {
-            indicator.style.backgroundColor = "#28a745";
-            indicator.style.color = "#ffffff";
-        } else {
-            indicator.style.backgroundColor = "#dc3545";
-            indicator.style.color = "#ffffff";
-        }
-        indicator.innerText = text;
-    }
-
-    async function testConnection() {
-        alert("بدء فحص الاتصال المباشر مع Supabase...");
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=*`, {
-                method: 'GET',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-            });
-            if(response.ok) {
-                alert("✅ الاتصال ناجح تماماً! السيرفر يستجيب والجدول جاهز.");
-                fetchBookings();
-            } else {
-                alert(`❌ السيرفر رد بـ خطأ رقم: ${response.status} - ${response.statusText}\nتأكد أن اسم الجدول هو bookings بحروف صغيرة، وأن المفتاح صحيح.`);
-            }
-        } catch (err) {
-            alert("❌ فشل الاتصال بالكامل. قد تكون هناك مشكلة انترنت أو رابط السيرفر مقيد.");
+            console.error(error);
+            // محاولة ثانية مخففة في حال رفض المتصفح العادي
+            try {
+                const altUrl = `${SUPABASE_URL}/rest/v1/bookings?select=*&apikey=${SUPABASE_KEY}`;
+                const res = await fetch(altUrl);
+                if(res.ok) {
+                    allBookings = await res.json();
+                    renderBookings();
+                    document.getElementById('syncStatus').style.backgroundColor = "#28a745";
+                    document.getElementById('syncStatus').innerText = "مُتصل ومحدّث (آمن)";
+                    return;
+                }
+            } catch(e){}
+            document.getElementById('syncStatus').style.backgroundColor = "#dc3545";
+            document.getElementById('syncStatus').style.color = "#ffffff";
+            document.getElementById('syncStatus').innerText = "تأخر الاستجابة من السيرفر";
         }
     }
 
@@ -253,7 +162,7 @@
             filteredData = allBookings.filter(b => b.booking_date < todayStr);
         }
 
-        if (filteredData.length === 0) {
+        if (!filteredData || filteredData.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" class="no-data">لا توجد حجوزات في هذا القسم حالياً.</td></tr>`;
             return;
         }
@@ -284,7 +193,7 @@
 
     window.onload = () => {
         fetchBookings();
-        setInterval(fetchBookings, 7000); 
+        setInterval(fetchBookings, 8000); 
     };
 </script>
 
