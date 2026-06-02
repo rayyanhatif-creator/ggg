@@ -170,14 +170,15 @@
 </div>
 
 <script>
-    // إعدادات الربط مع قاعدة بيانات Supabase الخاصة بك
-    const SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_URL.supabase.co"; 
-    const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY"; 
+    // تم إدخال روابط مشروعك في سوبابيس هنا مباشرة بشكل صحيح
+    const SUPABASE_URL = "https://daqtkhhlqlkpyppfecel.supabase.co"; 
+    
+    // ملاحظة ريان: تأكد فقط من استبدال الكلمة بالأسفل بمفتاح الـ sb_publishable اللي نسخته من صفحة API Keys
+    const SUPABASE_KEY = "حط_هنا_كود_sb_publishable_اللي_نسخته"; 
 
     let currentFilter = 'today';
     let allBookings = [];
 
-    // دالة جلب البيانات من السيرفر تلقائياً
     async function fetchBookings() {
         try {
             const response = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=*`, {
@@ -206,7 +207,6 @@
         const tbody = document.getElementById('bookingsBody');
         tbody.innerHTML = '';
 
-        // الحصول على تواريخ اليوم، أمس، وبكراً للمقارنة الذكية
         const todayStr = new Date().toISOString().split('T')[0];
         const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
         const tomorrowStr = tomorrow.toISOString().split('T')[0];
@@ -226,7 +226,6 @@
             return;
         }
 
-        // ترتيب الحجوزات من الأحدث وقتاً للأقدم
         filteredData.sort((a,b) => a.booking_time.localeCompare(b.booking_time));
 
         filteredData.forEach(booking => {
@@ -251,7 +250,6 @@
         renderBookings();
     }
 
-    // تشغيل الجلب التلقائي وتحديث البيانات كل 5 ثوانٍ بدون إنعاش الصفحة
     window.onload = () => {
         fetchBookings();
         setInterval(fetchBookings, 5000); 
