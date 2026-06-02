@@ -1,1 +1,262 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الحجوزات | نادي بادل</title>
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: #1f2833;
+            --accent-gold: #c5a059;
+            --text-color: #ffffff;
+            --text-muted: #c5a059b3;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--accent-gold);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--accent-gold);
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .live-indicator {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #2c3540;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent-gold);
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-gold);
+            color: var(--bg-color);
+        }
+
+        .bookings-table-container {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(197, 160, 89, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th {
+            background-color: rgba(197, 160, 89, 0.1);
+            color: var(--accent-gold);
+            padding: 15px;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(197, 160, 89, 0.3);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #2c3540;
+            font-size: 15px;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-badge {
+            background-color: rgba(197, 160, 89, 0.2);
+            color: var(--accent-gold);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>لوحة تحكم الحجوزات الذكية 🎾</h1>
+            <p style="color: var(--text-muted); margin: 5px 0 0 0;">حجوزات الملاعب المستلمة عبر مساعد الواتساب تلقائياً</p>
+        </div>
+        <div class="live-indicator" id="syncStatus">مُتصل ويحدث تلقائياً</div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('today')">حجوزات اليوم</button>
+        <button class="tab-btn" onclick="switchTab('tomorrow')">حجوزات بكراً</button>
+        <button class="tab-btn" onclick="switchTab('past')">حجوزات سابقة / أمس</button>
+        <button class="tab-btn" onclick="switchTab('all')">كل الحجوزات</button>
+    </div>
+
+    <div class="bookings-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم العميل</th>
+                    <th>رقم الجوال</th>
+                    <th>تاريخ الحجز</th>
+                    <th>الوقت</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody id="bookingsBody">
+                <tr><td colspan="5" class="no-data">جاري تحميل الحجوزات الحقيقية...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // إعدادات الربط مع قاعدة بيانات Supabase الخاصة بك
+    const SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_URL.supabase.co"; 
+    const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY"; 
+
+    let currentFilter = 'today';
+    let allBookings = [];
+
+    // دالة جلب البيانات من السيرفر تلقائياً
+    async function fetchBookings() {
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=*`, {
+                method: 'GET',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                allBookings = await response.json();
+                renderBookings();
+                document.getElementById('syncStatus').style.backgroundColor = "#28a745";
+                document.getElementById('syncStatus').innerText = "مُتصل ومحدّث";
+            }
+        } catch (error) {
+            console.error("خطأ في جلب البيانات:", error);
+            document.getElementById('syncStatus').style.backgroundColor = "#dc3545";
+            document.getElementById('syncStatus').innerText = "فشل الاتصال";
+        }
+    }
+
+    function renderBookings() {
+        const tbody = document.getElementById('bookingsBody');
+        tbody.innerHTML = '';
+
+        // الحصول على تواريخ اليوم، أمس، وبكراً للمقارنة الذكية
+        const todayStr = new Date().toISOString().split('T')[0];
+        const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+        let filteredData = allBookings;
+
+        if (currentFilter === 'today') {
+            filteredData = allBookings.filter(b => b.booking_date === todayStr);
+        } else if (currentFilter === 'tomorrow') {
+            filteredData = allBookings.filter(b => b.booking_date === tomorrowStr);
+        } else if (currentFilter === 'past') {
+            filteredData = allBookings.filter(b => b.booking_date < todayStr);
+        }
+
+        if (filteredData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="no-data">لا توجد حجوزات في هذا القسم حالياً.</td></tr>`;
+            return;
+        }
+
+        // ترتيب الحجوزات من الأحدث وقتاً للأقدم
+        filteredData.sort((a,b) => a.booking_time.localeCompare(b.booking_time));
+
+        filteredData.forEach(booking => {
+            const row = `
+                <tr>
+                    <td style="font-weight: bold;">${booking.customer_name}</td>
+                    <td>${booking.customer_phone}</td>
+                    <td>${booking.booking_date}</td>
+                    <td style="color: var(--accent-gold); font-weight: bold;">${booking.booking_time}</td>
+                    <td><span class="status-badge">${booking.status || 'مؤكد تلقائياً'}</span></td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function switchTab(tabName) {
+        currentFilter = tabName;
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        renderBookings();
+    }
+
+    // تشغيل الجلب التلقائي وتحديث البيانات كل 5 ثوانٍ بدون إنعاش الصفحة
+    window.onload = () => {
+        fetchBookings();
+        setInterval(fetchBookings, 5000); 
+    };
+</script>
+
+</body>
+</html>
