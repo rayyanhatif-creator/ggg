@@ -139,9 +139,9 @@
     <header>
         <div>
             <h1>لوحة تحكم الحجوزات الذكية 🎾</h1>
-            <p style="color: var(--text-muted); margin: 5px 0 0 0;">حجوزات الملاعب المستلمة عبر مساعد الواتساب تلقائياً</p>
+            <p style="color: var(--text-muted); margin: 5px 0 0 0;">حجوزات الملاعب المستلمة من شات البادل تلقائياً</p>
         </div>
-        <div class="live-indicator" id="syncStatus">مُتصل ويحدث تلقائياً</div>
+        <div class="live-indicator" id="syncStatus">جاري الاتصال...</div>
     </header>
 
     <div class="tabs">
@@ -170,11 +170,9 @@
 </div>
 
 <script>
-    // تم إدخال روابط مشروعك في سوبابيس هنا مباشرة بشكل صحيح
+    // إعدادات الربط المباشرة مع مشروعك في Supabase
     const SUPABASE_URL = "https://daqtkhhlqlkpyppfecel.supabase.co"; 
-    
-    // ملاحظة ريان: تأكد فقط من استبدال الكلمة بالأسفل بمفتاح الـ sb_publishable اللي نسخته من صفحة API Keys
-    const SUPABASE_KEY = "حط_هنا_كود_sb_publishable_اللي_نسخته"; 
+    const SUPABASE_KEY = "sb_publishable_mwiKjxLYtMCXwZ_ZdC7TLA_6Gz4GbiD"; 
 
     let currentFilter = 'today';
     let allBookings = [];
@@ -195,11 +193,13 @@
                 renderBookings();
                 document.getElementById('syncStatus').style.backgroundColor = "#28a745";
                 document.getElementById('syncStatus').innerText = "مُتصل ومحدّث";
+            } else {
+                throw new Error("استجابة غير ناجحة من السيرفر");
             }
         } catch (error) {
             console.error("خطأ في جلب البيانات:", error);
             document.getElementById('syncStatus').style.backgroundColor = "#dc3545";
-            document.getElementById('syncStatus').innerText = "فشل الاتصال";
+            document.getElementById('syncStatus').innerText = "فشل الاتصال بقاعدة البيانات";
         }
     }
 
